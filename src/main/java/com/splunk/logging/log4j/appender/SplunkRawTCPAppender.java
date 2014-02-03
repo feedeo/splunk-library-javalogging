@@ -60,10 +60,21 @@ public class SplunkRawTCPAppender extends AppenderSkeleton {
 			return;
 		}
 
-		String formatted = layout.format(event);
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append(layout.format(event));
 
-		sri.streamEvent(formatted);
+        if(layout.ignoresThrowable()) {
+            String[] s = event.getThrowableStrRep();
+            if (s != null) {
+                int len = s.length;
+                for(int i = 0; i < len; i++) {
+                    stringBuilder.append(s[i]);
+                    stringBuilder.append(Layout.LINE_SEP);
+                }
+            }
+        }
 
+		sri.streamEvent(stringBuilder.toString());
 	}
 
 	/**
